@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: smart-health-tracker-backend
+    env: node
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: smart-health-tracker-frontend
+          property: url
+
+  - type: web
+    name: smart-health-tracker-frontend
+    env: static
+    region: oregon
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    rootDir: frontend
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: smart-health-tracker-backend
+          property: url
